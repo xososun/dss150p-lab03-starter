@@ -36,28 +36,10 @@ Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if 
 
 ---
 ## Deliverables
-### 7.1 Task A
+
 ```bash
 python --version
 Python 3.14.6
-
-pip list
-Package         Version
---------------- -----------
-numpy           2.5.3
-packaging       26.3
-pandas          3.0.6
-pip             26.2.1
-psycopg         3.3.6
-psycopg-binary  3.3.6
-pyarrow         25.0.1
-python-dateutil 2.9.0.post0
-python-dotenv   1.2.3
-PyYAML          6.0.3
-setuptools      84.0.0
-six             1.17.0
-tzdata          2026.4
-wheel           0.48.0
 ```
 #### Why should .venv not be committed to Git?
 It contains compiled binaries, dynamic link libraries, and executable scripts specific to
@@ -65,3 +47,11 @@ individual operating system and CPU architecture. Thus, committing it breaks
 functionality across different platforms. It could also bloat repo size and slow down
 Git operations.
 
+#### How configuration is separated from code
+Settings.yml stores non-secret, environment-independent defaults, such as paths, quality rules, and benchmark settings.
+
+.env manages environment-specific values and secrets, including database hosts and credentials. This file stays git-ignored and never enters source control.
+
+src/config.py acts as the single source of truth for application settings. It reads settings.yml and .env, exposing values through objects like SETTINGS, DB, and path_for(). No other module reads os.environ or the YAML file directly.
+
+Docker Compose overrides values dynamically at runtime (for instance, setting POSTGRES_HOST=postgres). Because load_dotenv() preserves existing environment variables, container orchestration requires zero code modifications.
