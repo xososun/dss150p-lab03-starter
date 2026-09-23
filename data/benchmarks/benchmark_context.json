@@ -1,0 +1,8 @@
+{
+  "repeats": 5,
+  "status_filter": "DELIVERED",
+  "python_version": "3.14.6",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "cpu_count": 12
+}

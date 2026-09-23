@@ -1,9 +1,19 @@
 # Run Evidence
 
 ## Week 4
-- Python version:
-- Git status/log evidence:
+- Python version: Python 3.14.16
+- Git status/log evidence: 
+```bash 
+$ git status --short
+ M .idea/dss150p-lab03-starter.iml
+ M README.md
+ M requirements.txt
+ M templates/run_evidence_template.md
+```
 - Docker image/container evidence:
+```bash
+
+```
 - External configuration evidence:
 
 ## Week 5
