@@ -35,8 +35,8 @@ docker compose -f docker-compose.yml -f docker-compose.airflow.yml up -d airflow
 Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if reused outside the lab).
 
 ---
-## Deliverables
-
+## FAQ
+#### Python Version for this Project
 ```bash
 python --version
 Python 3.14.6
@@ -55,3 +55,28 @@ Settings.yml stores non-secret, environment-independent defaults, such as paths,
 src/config.py acts as the single source of truth for application settings. It reads settings.yml and .env, exposing values through objects like SETTINGS, DB, and path_for(). No other module reads os.environ or the YAML file directly.
 
 Docker Compose overrides values dynamically at runtime (for instance, setting POSTGRES_HOST=postgres). Because load_dotenv() preserves existing environment variables, container orchestration requires zero code modifications.
+
+#### Explain how partitioning can reduce unnecessary I/O when queries filter on partition keys.
+Partitioning splits a large database table into smaller, independent physical units based on a specific column, called the partition key.
+
+When you run a query filtering on that key, the query optimizer performs partition pruning (or partition elimination). The engine reads the filter condition in your WHERE clause, calculates which specific partitions contain matching rows, and skips reading all other partitions entirely.
+
+---
+## AI Tool Usage Disclosure
+Generative AI (Claude) was used during this lab as a debugging, design-review, and writing-refinement aid, consistent with the course's AI use policy.
+
+How it was used:
+
+* Reviewing my own module stubs and explaining what each TODO required before I implemented it.
+* Drafting implementations for src/extract/files.py, src/transform/staging.py, src/transform/curated.py, src/load/postgres.py, src/validate/quality.py, src/benchmark/storage.py, src/cli.py wiring, and dags/dss150p_pipeline.py, which I then ran against the real project data, reviewed, and am able to explain and defend.
+* Diagnosing real runtime errors I encountered (e.g. a cursor-closed bug in the PostgreSQL loader, a stale-partition bug in the partition loader, a partition-file-duplication bug, and an Airflow run_id sanitization issue) by reading my actual tracebacks and command output, not by guessing.
+* Explaining configuration/security tradeoffs (e.g. removing a hard-coded database password default) and Airflow/DAG design choices (retries, timeouts, catchup, run_id propagation).
+* Helping draft the Goal 3 storage-format analysis and the Goal 4 backfill explanation, which I reviewed and wrote in my own words based on my own benchmark numbers.
+
+What I did myself:
+
+* Ran every command against my own environment and database; all counts, timings, screenshots, and logs in this submission are from my own machine, not fabricated or copied from the AI.
+* Reviewed, tested, and can explain every line of AI-assisted code, including the bugs found and why the fixes work.
+* Made the design decisions the lab required judgment on (e.g. how run_id is shared across CLI invocations vs. Airflow tasks; how curated columns map to the PostgreSQL schema; dedupe-before-validate ordering in staging).
+
+I understand I may be asked to explain, modify, or reproduce any part of this pipeline's behavior during validation.

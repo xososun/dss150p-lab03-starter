@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import platform
+import shutil
 import statistics
 import time
 from pathlib import Path
@@ -165,6 +166,13 @@ def write_partitioned_parquet(df, output_dir):
     """
     output_dir = Path(output_dir)
     partition_cols = SETTINGS['storage_benchmark']['partition_columns']
+
+    # to_parquet(..., partition_cols=...) ADDS a new file into each partition folder
+    # on every call rather than replacing it. Since this dataset is rebuilt on every
+    # run (see cli.cmd_load_partition), the old tree must be cleared first or repeated
+    # runs silently double-count rows the next time a partition is read back.
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
 
     df = df.copy()
     df['order_year'] = df['order_timestamp'].dt.year
