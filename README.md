@@ -36,18 +36,20 @@ Airflow UI: http://localhost:8080 (training credentials: admin/admin; change if 
 
 ---
 ## FAQ
-#### Python Version for this Project
+### Python Version for this Project
 ```bash
 python --version
 Python 3.14.6
 ```
-#### Why should .venv not be committed to Git?
+The initial requirements.txt has been modified to match with my machine. Libraries versions might differ.
+
+### Why should .venv not be committed to Git?
 It contains compiled binaries, dynamic link libraries, and executable scripts specific to
 individual operating system and CPU architecture. Thus, committing it breaks
 functionality across different platforms. It could also bloat repo size and slow down
 Git operations.
 
-#### How configuration is separated from code
+### How configuration is separated from code
 Settings.yml stores non-secret, environment-independent defaults, such as paths, quality rules, and benchmark settings.
 
 .env manages environment-specific values and secrets, including database hosts and credentials. This file stays git-ignored and never enters source control.
@@ -56,10 +58,14 @@ src/config.py acts as the single source of truth for application settings. It re
 
 Docker Compose overrides values dynamically at runtime (for instance, setting POSTGRES_HOST=postgres). Because load_dotenv() preserves existing environment variables, container orchestration requires zero code modifications.
 
-#### Explain how partitioning can reduce unnecessary I/O when queries filter on partition keys.
+### Explain how partitioning can reduce unnecessary I/O when queries filter on partition keys.
 Partitioning splits a large database table into smaller, independent physical units based on a specific column, called the partition key.
 
 When you run a query filtering on that key, the query optimizer performs partition pruning (or partition elimination). The engine reads the filter condition in your WHERE clause, calculates which specific partitions contain matching rows, and skips reading all other partitions entirely.
+
+### Why do I need to set PIPELINE_RUN_ID?
+
+Each CLI command generates a new run_id unless one is provided, since separate invocations are separate processes (this mirrors how Airflow tasks run as separate processes too). To chain commands against the same data, set PIPELINE_RUN_ID once before running them, or pass --run-id explicitly to each command.
 
 ---
 ## AI Tool Usage Disclosure
